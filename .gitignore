@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Production / Build outputs
+dist/
+dist-electron/
+release/
+
+# Logs and runtime data
+*.log
+run_debug.log
+
+# OS generated files
+Thumbs.db
+.DS_Store

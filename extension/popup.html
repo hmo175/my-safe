@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Safe</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 320px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0B0F17;
+      color: #F3F4F6;
+      user-select: none;
+    }
+    .header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1F2937;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0F1420;
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-badge {
+      width: 24px;
+      height: 24px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10B981;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #10B981;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .brand-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 6px #10B981;
+    }
+    .status-dot.disconnected {
+      background: #EF4444;
+      box-shadow: 0 0 6px #EF4444;
+    }
+    .content {
+      padding: 16px;
+    }
+    .status-card {
+      background: #111827;
+      border: 1px solid #1F2937;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #10B981;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #059669;
+    }
+    .pair-section {
+      display: none;
+      text-align: center;
+    }
+    .code-input {
+      width: 100%;
+      padding: 10px;
+      background: #070A0F;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #10B981;
+      font-family: monospace;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+    .code-input:focus {
+      outline: none;
+      border-color: #10B981;
+    }
+    .accounts-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .account-item {
+      padding: 10px;
+      background: #111827;
+      border: 1px solid #1F2937;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .account-item:hover {
+      border-color: #10B981;
+    }
+    .account-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .account-user {
+      font-size: 11px;
+      color: #9CA3AF;
+      font-family: monospace;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-group">
+      <div class="logo-badge">M</div>
+      <span class="brand-title">My Safe</span>
+    </div>
+    <div id="statusDot" class="status-dot"></div>
+  </div>
+
+  <div class="content">
+    <!-- Unpaired Screen -->
+    <div id="pairSection" class="pair-section">
+      <p style="font-size: 11px; color: #9CA3AF; margin-bottom: 12px; line-height: 1.5;">
+        أدخل كود الاقتران المكون من 6 أرقام الظاهر في تطبيق سطح المكتب لربط الإضافة بالخزنة:
+      </p>
+      <input type="text" id="pairCodeInput" class="code-input" maxlength="6" placeholder="------" />
+      <button id="pairBtn" class="btn">تأكيد الاقتران</button>
+    </div>
+
+    <!-- Connected Screen -->
+    <div id="connectedSection">
+      <div class="status-card">
+        <div style="font-size: 11px; color: #9CA3AF; margin-bottom: 4px;">الموقع النشط حالياً:</div>
+        <div id="currentDomain" style="font-weight: 600; color: #10B981;">-</div>
+      </div>
+
+      <div style="font-size: 11px; font-weight: 700; color: #9CA3AF; margin-bottom: 8px;">الحسابات المتاحة لهذا الموقع:</div>
+      <div id="accountsList" class="accounts-list">
+        <div style="text-align: center; padding: 20px; font-size: 11px; color: #6B7280;">
+          جاري البحث...
+        </div>
+      </div>
+    </div>
+
+    <!-- Developer Credits -->
+    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #1F2937; text-align: center; font-size: 10px; color: #6B7280;">
+      By <strong style="color: #10B981;">Eng. Mohammed Al-Gunaid</strong> (@hmo175)
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
