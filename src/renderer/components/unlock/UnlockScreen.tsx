@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Lock, Fingerprint, KeyRound, Eye, EyeOff, AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, Fingerprint, KeyRound, Eye, EyeOff, AlertCircle, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Translations } from '../../locales/translations';
 
 interface UnlockScreenProps {
@@ -15,6 +15,15 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({ t, lang, onUnlocked 
   const [recoveryKey, setRecoveryKey] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [bioEnabled, setBioEnabled] = useState(false);
+
+  useEffect(() => {
+    if (window.mySafe) {
+      window.mySafe.isBiometricsAvailable().then((avail) => setBioAvailable(!!avail));
+      window.mySafe.isBiometricsEnabled().then((enabled) => setBioEnabled(!!enabled));
+    }
+  }, []);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +63,16 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({ t, lang, onUnlocked 
       if (window.mySafe) {
         const isEnabled = await window.mySafe.isBiometricsEnabled();
         if (!isEnabled) {
-          setError('بصمة Windows Hello غير مفعلة بعد. يرجى الدخول بكلمة المرور الرئيسية وتفعيلها من الإعدادات.');
+          const isAvail = await window.mySafe.isBiometricsAvailable();
+          if (isAvail) {
+            setError(lang === 'ar' 
+              ? 'مستشعر Windows Hello متاح! يرجى تسجيل الدخول أولاً بكلمة المرور الرئيسية لتفعيل البصمة تلقائياً.' 
+              : 'Windows Hello is available! Please log in once with your Master Password to enable it.');
+          } else {
+            setError(lang === 'ar'
+              ? 'Windows Hello غير مفعل أو غير متوفر في إعدادات الويندوز لهذا الجهاز.'
+              : 'Windows Hello is not configured or not available on this device.');
+          }
           return;
         }
 
@@ -63,7 +81,7 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({ t, lang, onUnlocked 
           const data = await window.mySafe.getData();
           onUnlocked(data);
         } else {
-          setError(res?.error || 'فشلت المصادقة بالبصمة.');
+          setError(res?.error || (lang === 'ar' ? 'فشلت المصادقة بالبصمة.' : 'Biometric verification failed.'));
         }
       }
     } catch (err: any) {
@@ -164,10 +182,18 @@ export const UnlockScreen: React.FC<UnlockScreenProps> = ({ t, lang, onUnlocked 
           <button
             type="button"
             onClick={handleBiometricUnlock}
-            className="w-full py-2.5 px-3 bg-gray-800/60 hover:bg-gray-800 text-gray-300 hover:text-white rounded-xl text-xs font-medium border border-gray-700/60 flex items-center justify-center gap-2 transition-colors"
+            disabled={loading}
+            className={`w-full py-2.5 px-3 rounded-xl text-xs font-medium border flex items-center justify-center gap-2 transition-all ${
+              bioEnabled
+                ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-sm shadow-emerald-500/10'
+                : 'bg-gray-800/60 hover:bg-gray-800 text-gray-300 hover:text-white border-gray-700/60'
+            }`}
           >
-            <Fingerprint className="w-4 h-4 text-emerald-400" />
+            <Fingerprint className={`w-4 h-4 ${bioEnabled ? 'text-emerald-400 animate-pulse' : 'text-gray-400'}`} />
             <span>{t.unlockWithBiometrics}</span>
+            {bioEnabled && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block ml-1" />
+            )}
           </button>
 
           <button

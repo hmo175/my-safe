@@ -58,6 +58,9 @@
       "dist-electron/**/*",
       "resources/**/*"
     ],
+    "asarUnpack": [
+      "dist-electron/biometrics/**/*"
+    ],
     "win": {
       "target": [
         {

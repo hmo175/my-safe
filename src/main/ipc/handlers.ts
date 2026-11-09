@@ -149,17 +149,20 @@ export function registerIpcHandlers(
 
   ipcMain.handle('biometrics:unlock', async () => {
     if (!winHello.isEnabled()) {
-      return { success: false, error: 'بصمة Windows Hello غير مفعلة لهذا الحساب بعد.' };
+      return { success: false, error: 'بصمة Windows Hello غير مفعلة بعد. يرجى تسجيل الدخول أولاً بكلمة المرور الرئيسية لتفعيلها.' };
     }
 
-    const verified = await winHello.requestVerification('My Safe - Authentication');
-    if (!verified) {
-      return { success: false, error: 'تم إلغاء المصادقة أو فشلت البصمة.' };
+    const { success, status } = await winHello.requestVerification('My Safe - تسجيل الدخول بالبصمة');
+    if (!success) {
+      if (status === 'Canceled') {
+        return { success: false, error: 'تم إلغاء عملية المصادقة بالبصمة من قبل المستخدم.' };
+      }
+      return { success: false, error: `فشلت المصادقة بالبصمة (${status}). يرجى المحاولة مجدداً أو استخدام كلمة المرور الرئيسية.` };
     }
 
     const masterKey = winHello.getMasterKey();
     if (!masterKey) {
-      return { success: false, error: 'تعذر استرجاع مفتاح الخزنة المحمي.' };
+      return { success: false, error: 'تعذر استرجاع مفتاح الخزنة المحمي. يرجى تسجيل الدخول بكلمة المرور الرئيسية.' };
     }
 
     const unlocked = vaultManager.unlockWithKey(masterKey);
