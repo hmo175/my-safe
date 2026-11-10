@@ -1,4 +1,4 @@
-import { app, BrowserWindow, powerMonitor, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, powerMonitor, Tray, Menu, nativeImage, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { VaultManager } from './storage/vaultDb';
@@ -118,16 +118,45 @@ function createWindow() {
     });
   }
 
+  // Activity tracking for idle auto-lock
+  let lastActivityTimestamp = Date.now();
+  ipcMain.on('user:activity', () => {
+    lastActivityTimestamp = Date.now();
+  });
+
+  // Background idle monitor (checks every 10 seconds)
+  setInterval(() => {
+    if (!vaultManager || !vaultManager.isUnlocked()) return;
+
+    try {
+      const data = vaultManager.getData();
+      const autoLockMinutes = data?.settings?.autoLockMinutes ?? 5;
+      if (autoLockMinutes <= 0) return; // 0 = never
+
+      const systemIdleSeconds = powerMonitor.getSystemIdleTime();
+      const appInactiveSeconds = Math.floor((Date.now() - lastActivityTimestamp) / 1000);
+
+      // Lock if whole system idle OR app has had no user interaction for configured minutes
+      if (systemIdleSeconds >= autoLockMinutes * 60 || appInactiveSeconds >= autoLockMinutes * 60) {
+        console.log(`[AutoLock] Locking vault after ${autoLockMinutes} min of inactivity.`);
+        vaultManager.lock();
+        mainWindow?.webContents.send('vault:autoLocked');
+      }
+    } catch (err) {
+      console.warn('[AutoLock] Check failed:', err);
+    }
+  }, 10000);
+
   // Auto-lock when workstation is locked (Win + L) or system suspends/sleeps
   powerMonitor.on('lock-screen', () => {
-    if (vaultManager) {
+    if (vaultManager && vaultManager.isUnlocked()) {
       vaultManager.lock();
       mainWindow?.webContents.send('vault:autoLocked');
     }
   });
 
   powerMonitor.on('suspend', () => {
-    if (vaultManager) {
+    if (vaultManager && vaultManager.isUnlocked()) {
       vaultManager.lock();
       mainWindow?.webContents.send('vault:autoLocked');
     }
@@ -137,7 +166,28 @@ function createWindow() {
   mainWindow.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault();
+      // Lock vault when closed to background tray
+      if (vaultManager && vaultManager.isUnlocked()) {
+        const data = vaultManager.getData();
+        if (data?.settings?.lockOnCloseToTray !== false) {
+          console.log('[Main] Window closed to background tray - locking vault.');
+          vaultManager.lock();
+          mainWindow?.webContents.send('vault:autoLocked');
+        }
+      }
       mainWindow?.hide();
+    }
+  });
+
+  // Auto-lock when window is minimized
+  mainWindow.on('minimize', () => {
+    if (vaultManager && vaultManager.isUnlocked()) {
+      const data = vaultManager.getData();
+      if (data?.settings?.lockOnMinimize !== false) {
+        console.log('[Main] Window minimized - locking vault.');
+        vaultManager.lock();
+        mainWindow?.webContents.send('vault:autoLocked');
+      }
     }
   });
 

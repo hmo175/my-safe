@@ -12,6 +12,8 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
+  Timer,
+  Minimize2,
 } from 'lucide-react';
 import { Translations } from '../../locales/translations';
 
@@ -39,6 +41,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  // Auto-Lock state
+  const [autoLockMinutes, setAutoLockMinutes] = useState<number>(5);
+  const [lockOnCloseToTray, setLockOnCloseToTray] = useState<boolean>(true);
+  const [lockOnMinimize, setLockOnMinimize] = useState<boolean>(true);
+
   // Change Password state
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
@@ -52,8 +59,68 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     if (isOpen && window.mySafe) {
       window.mySafe.isBiometricsAvailable().then(setHelloAvailable);
       window.mySafe.isBiometricsEnabled().then(setHelloEnabled);
+      window.mySafe.getData().then((data) => {
+        if (data?.settings) {
+          setAutoLockMinutes(data.settings.autoLockMinutes ?? 5);
+          setLockOnCloseToTray(data.settings.lockOnCloseToTray ?? true);
+          setLockOnMinimize(data.settings.lockOnMinimize ?? true);
+        }
+      });
     }
   }, [isOpen]);
+
+  const handleUpdateAutoLockMinutes = async (mins: number) => {
+    setAutoLockMinutes(mins);
+    if (window.mySafe) {
+      const data = await window.mySafe.getData();
+      const newSettings = {
+        ...(data?.settings || {}),
+        autoLockMinutes: mins,
+      };
+      await window.mySafe.saveSettings(newSettings);
+      onRefreshData();
+      setMessage(lang === 'ar' 
+        ? `تم حفظ القفل التلقائي بعد ${mins === 0 ? 'تعطيل القفل' : mins + ' دقيقة'}` 
+        : `Auto-lock set to ${mins === 0 ? 'Never' : mins + ' min'}`);
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const handleToggleCloseToTray = async () => {
+    const nextVal = !lockOnCloseToTray;
+    setLockOnCloseToTray(nextVal);
+    if (window.mySafe) {
+      const data = await window.mySafe.getData();
+      const newSettings = {
+        ...(data?.settings || {}),
+        lockOnCloseToTray: nextVal,
+      };
+      await window.mySafe.saveSettings(newSettings);
+      onRefreshData();
+      setMessage(lang === 'ar'
+        ? nextVal ? 'تم تفعيل القفل عند الإخفاء في الخلفية' : 'تم تعطيل القفل عند الإخفاء في الخلفية'
+        : nextVal ? 'Lock when closed to tray enabled' : 'Lock when closed to tray disabled');
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const handleToggleMinimize = async () => {
+    const nextVal = !lockOnMinimize;
+    setLockOnMinimize(nextVal);
+    if (window.mySafe) {
+      const data = await window.mySafe.getData();
+      const newSettings = {
+        ...(data?.settings || {}),
+        lockOnMinimize: nextVal,
+      };
+      await window.mySafe.saveSettings(newSettings);
+      onRefreshData();
+      setMessage(lang === 'ar'
+        ? nextVal ? 'تم تفعيل القفل عند تصغير النافذة' : 'تم تعطيل القفل عند تصغير النافذة'
+        : nextVal ? 'Lock on minimize enabled' : 'Lock on minimize disabled');
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
 
   const handleToggleHello = async () => {
     if (!window.mySafe) return;
@@ -216,7 +283,98 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
-          {/* 3. Change Master Password */}
+          {/* 3. Auto-Lock & Background Security */}
+          <div className="p-4 rounded-xl bg-[#090D14] border border-gray-800 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <Timer className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-xs">
+                  {lang === 'ar' ? 'القفل التلقائي وحماية الخلفية' : 'Auto-Lock & Background Security'}
+                </h4>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  {lang === 'ar' 
+                    ? 'قفل الخزنة تلقائياً عند الخمول أو الإخفاء لشريط المهام'
+                    : 'Automatically lock vault when idle or minimized to tray'}
+                </p>
+              </div>
+            </div>
+
+            {/* Timeout buttons */}
+            <div className="pt-2 border-t border-gray-800/80">
+              <label className="block text-[11px] font-medium text-gray-400 mb-2">
+                {lang === 'ar' ? 'مدة الخمول قبل القفل التلقائي:' : 'Inactivity timeout before lock:'}
+              </label>
+              <div className="grid grid-cols-5 gap-1.5">
+                {[1, 5, 10, 15, 0].map((mins) => (
+                  <button
+                    key={mins}
+                    type="button"
+                    onClick={() => handleUpdateAutoLockMinutes(mins)}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold border transition-all ${
+                      autoLockMinutes === mins
+                        ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400 shadow-sm'
+                        : 'bg-gray-800/60 hover:bg-gray-800 border-gray-700/60 text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    {mins === 0 
+                      ? (lang === 'ar' ? 'أبداً' : 'Never') 
+                      : (lang === 'ar' ? `${mins} د` : `${mins}m`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Toggles */}
+            <div className="pt-2 border-t border-gray-800/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-gray-200 font-medium">
+                    {lang === 'ar' ? 'قفل الخزنة عند الإخفاء في شريط المهام (X)' : 'Lock when closed to system tray (X)'}
+                  </span>
+                  <p className="text-[10px] text-gray-400">
+                    {lang === 'ar' ? 'يطلب كلمة المرور/البصمة فور فتح النافذة مجدداً' : 'Require password/biometrics upon reopening'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleCloseToTray}
+                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                    lockOnCloseToTray
+                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+                      : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  {lockOnCloseToTray ? (lang === 'ar' ? 'مفعّل ✓' : 'Enabled ✓') : (lang === 'ar' ? 'معطل' : 'Disabled')}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-gray-200 font-medium">
+                    {lang === 'ar' ? 'قفل الخزنة عند تصغير النافذة' : 'Lock when window is minimized'}
+                  </span>
+                  <p className="text-[10px] text-gray-400">
+                    {lang === 'ar' ? 'قفل فوري عند النزول لشريط المهام' : 'Immediate lock when window is minimized'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleMinimize}
+                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                    lockOnMinimize
+                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+                      : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  {lockOnMinimize ? (lang === 'ar' ? 'مفعّل ✓' : 'Enabled ✓') : (lang === 'ar' ? 'معطل' : 'Disabled')}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Change Master Password */}
           <div className="p-4 rounded-xl bg-[#090D14] border border-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

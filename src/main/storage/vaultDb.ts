@@ -75,6 +75,8 @@ export interface VaultData {
     antiScreenCapture: boolean;
     language: 'ar' | 'en';
     theme: 'dark' | 'light';
+    lockOnCloseToTray: boolean;
+    lockOnMinimize: boolean;
   };
 }
 
@@ -199,11 +201,13 @@ export class VaultManager {
       items: [],
       folders: ['Personal', 'Work', 'Finance'],
       settings: {
-        autoLockMinutes: 10,
+        autoLockMinutes: 5,
         clipboardClearSeconds: 30,
         antiScreenCapture: true,
         language: 'ar',
         theme: 'dark',
+        lockOnCloseToTray: true,
+        lockOnMinimize: true,
       },
     };
 
@@ -318,11 +322,13 @@ export class VaultManager {
         items: [],
         folders: ['Personal', 'Work', 'Finance'],
         settings: {
-          autoLockMinutes: 10,
+          autoLockMinutes: 5,
           clipboardClearSeconds: 30,
           antiScreenCapture: true,
           language: 'ar',
           theme: 'dark',
+          lockOnCloseToTray: true,
+          lockOnMinimize: true,
         },
       };
       return;
@@ -331,6 +337,17 @@ export class VaultManager {
     const rawEncrypted: EncryptedPayload = JSON.parse(fs.readFileSync(this.dataPath, 'utf-8'));
     const decryptedJson = decryptAESGCMString(rawEncrypted, this.masterKey);
     this.cachedData = JSON.parse(decryptedJson);
+    if (this.cachedData && this.cachedData.settings) {
+      if (this.cachedData.settings.autoLockMinutes === undefined) {
+        this.cachedData.settings.autoLockMinutes = 5;
+      }
+      if (this.cachedData.settings.lockOnCloseToTray === undefined) {
+        this.cachedData.settings.lockOnCloseToTray = true;
+      }
+      if (this.cachedData.settings.lockOnMinimize === undefined) {
+        this.cachedData.settings.lockOnMinimize = true;
+      }
+    }
   }
 
   /**

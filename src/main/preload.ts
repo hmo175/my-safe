@@ -25,6 +25,8 @@ export interface MySafeAPI {
   exportFile: (storedFileName: string, defaultName: string) => Promise<boolean>;
   getPairingCode: () => Promise<string>;
   generateNewPairingCode: () => Promise<string>;
+  onAutoLocked: (callback: () => void) => () => void;
+  notifyActivity: () => void;
 }
 
 const api: MySafeAPI = {
@@ -52,6 +54,16 @@ const api: MySafeAPI = {
   exportFile: (storedFileName: string, defaultName: string) => ipcRenderer.invoke('vault:exportFile', { storedFileName, defaultName }),
   getPairingCode: () => ipcRenderer.invoke('bridge:getPairingCode'),
   generateNewPairingCode: () => ipcRenderer.invoke('bridge:generateNewCode'),
+  onAutoLocked: (callback: () => void) => {
+    const handler = () => callback();
+    ipcRenderer.on('vault:autoLocked', handler);
+    return () => {
+      ipcRenderer.removeListener('vault:autoLocked', handler);
+    };
+  },
+  notifyActivity: () => {
+    ipcRenderer.send('user:activity');
+  },
 };
 
 contextBridge.exposeInMainWorld('mySafe', api);

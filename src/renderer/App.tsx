@@ -45,7 +45,59 @@ export default function App() {
 
   useEffect(() => {
     checkVaultStatus();
+
+    // Listen to auto-lock events emitted from main process (close-to-tray, minimize, sleep, idle)
+    if (window.mySafe?.onAutoLocked) {
+      const unsubscribe = window.mySafe.onAutoLocked(() => {
+        setIsUnlocked(false);
+        setVaultData(null);
+      });
+
+      // Also re-verify status whenever window gains focus
+      const onFocus = () => {
+        checkVaultStatus();
+      };
+      window.addEventListener('focus', onFocus);
+
+      return () => {
+        unsubscribe();
+        window.removeEventListener('focus', onFocus);
+      };
+    }
   }, []);
+
+  // In-app inactivity timer (auto-lock after configured minutes, e.g. 5 minutes)
+  useEffect(() => {
+    if (!isUnlocked) return;
+
+    const autoLockMinutes = vaultData?.settings?.autoLockMinutes ?? 5;
+    if (autoLockMinutes <= 0) return; // 0 = disabled
+
+    const timeoutMs = autoLockMinutes * 60 * 1000;
+    let timer: any = null;
+
+    const resetTimer = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(async () => {
+        console.log(`[AutoLock] Locking vault after ${autoLockMinutes} minutes of inactivity.`);
+        await handleLock();
+      }, timeoutMs);
+    };
+
+    const handleUserActivity = () => {
+      resetTimer();
+      window.mySafe?.notifyActivity?.();
+    };
+
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach((ev) => window.addEventListener(ev, handleUserActivity, { passive: true }));
+    resetTimer();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      events.forEach((ev) => window.removeEventListener(ev, handleUserActivity));
+    };
+  }, [isUnlocked, vaultData?.settings?.autoLockMinutes]);
 
   const handleToggleLang = () => {
     const next = lang === 'ar' ? 'en' : 'ar';
