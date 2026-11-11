@@ -1,5 +1,5 @@
 // My Safe Extension - Universal Background Worker / Script (Chromium & Firefox)
-// Author: Eng. Mohammed Al-Gunaid (@hmo175)
+// Author: hmo (@hmo175)
 
 const ext = typeof browser !== 'undefined' ? browser : chrome;
 const BRIDGE_URL = 'http://127.0.0.1:48521';

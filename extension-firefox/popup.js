@@ -1,5 +1,5 @@
 // My Safe Popup Controller (Chromium & Firefox Compatible)
-// Author: Eng. Mohammed Al-Gunaid (@hmo175)
+// Author: hmo (@hmo175)
 
 const ext = typeof browser !== 'undefined' ? browser : chrome;
 

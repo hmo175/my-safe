@@ -574,13 +574,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 p-0.5 shadow-md shadow-emerald-500/20">
-                  <div className="w-full h-full bg-[#0B0F17] rounded-[10px] flex items-center justify-center font-bold text-emerald-400 text-xs">
-                    EG
+                  <div className="w-full h-full bg-[#0B0F17] rounded-[10px] flex items-center justify-center font-bold text-emerald-400 text-[11px]">
+                    hmo
                   </div>
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-white text-xs">Eng. Mohammed Al-Gunaid</h4>
+                    <h4 className="font-bold text-white text-xs">hmo</h4>
                     <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold">
                       المطور ومبتكر المشروع
                     </span>
@@ -604,8 +604,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             
             <div className="mt-3 pt-2.5 border-t border-gray-800/80 flex items-center justify-between text-[10px] text-gray-400">
-              <span>جميع الحقوق محفوظة للمهندس محمد الجنيد</span>
-              <span className="font-mono">© 2026 Eng. Mohammed Al-Gunaid</span>
+              <span>جميع الحقوق محفوظة لـ hmo</span>
+              <span className="font-mono">© 2026 hmo</span>
             </div>
           </div>
         </div>

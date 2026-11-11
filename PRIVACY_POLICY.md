@@ -1,7 +1,7 @@
 # Privacy Policy — My Safe Browser Extension & Desktop Vault
 
 **Effective Date:** 2026-11-11  
-**Developer:** Eng. Mohammed Al-Gunaid (`@hmo175`)  
+**Developer:** hmo (`@hmo175`)  
 **Repository:** https://github.com/hmo175/my-safe  
 
 ---
@@ -48,4 +48,4 @@ All vault entries and encrypted files remain inside your Windows user profile en
 ## 5. Contact
 
 For questions or security disclosures, contact the developer via GitHub:  
-**Eng. Mohammed Al-Gunaid** — https://github.com/hmo175
+**hmo** — https://github.com/hmo175

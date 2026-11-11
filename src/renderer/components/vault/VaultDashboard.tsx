@@ -352,7 +352,7 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
               className="group inline-flex items-center justify-center gap-1.5 text-[10px] text-gray-400 hover:text-emerald-400 transition-colors w-full"
             >
               <span>By</span>
-              <span className="font-semibold text-gray-300 group-hover:text-emerald-400">Eng. Mohammed Al-Gunaid</span>
+              <span className="font-semibold text-gray-300 group-hover:text-emerald-400">hmo</span>
               <ExternalLink className="w-2.5 h-2.5 text-gray-400 group-hover:text-emerald-400" />
             </a>
           </div>

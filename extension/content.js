@@ -1,5 +1,5 @@
 // My Safe Content Script - Cross-Browser In-Field Detection & Autofill
-// Author: Eng. Mohammed Al-Gunaid (@hmo175)
+// Author: hmo (@hmo175)
 (function () {
   if (window.__mySafeContentLoaded) return;
   window.__mySafeContentLoaded = true;

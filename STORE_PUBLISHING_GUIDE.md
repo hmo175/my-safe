@@ -1,6 +1,6 @@
 # دليل نشر إضافة My Safe على متاجر جميع المتصفحات 🌍🚀
 
-**إعداد المطور:** Eng. Mohammed Al-Gunaid (`@hmo175`)  
+**إعداد المطور:** hmo (`@hmo175`)  
 **الملفات الجاهزة للرفع في مجلد `release/`:**
 - **للمتصفحات المبنية على Chromium (Chrome, Edge, Brave, Opera, Vivaldi):**  
   `release/MySafe-Extension-Chromium-v1.0.0.zip`

@@ -22,7 +22,7 @@
     "argon2",
     "aes-gcm"
   ],
-  "author": "Eng. Mohammed Al-Gunaid <https://github.com/hmo175>",
+  "author": "hmo <https://github.com/hmo175>",
   "homepage": "https://github.com/hmo175/my-safe",
   "license": "MIT",
   "devDependencies": {
@@ -50,7 +50,7 @@
   "build": {
     "appId": "com.mysafe.vault",
     "productName": "My Safe",
-    "copyright": "Copyright © 2026 Eng. Mohammed Al-Gunaid",
+    "copyright": "Copyright © 2026 hmo",
     "directories": {
       "output": "release"
     },

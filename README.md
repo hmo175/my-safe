@@ -14,7 +14,7 @@
 
 <br/>
 
-**Designed & Engineered by [Eng. Mohammed Al-Gunaid](https://github.com/hmo175) (`@hmo175`)**
+**Designed & Engineered by [hmo](https://github.com/hmo175) (`@hmo175`)**
 
 [📥 Download Installer](#-التحميل-والتشغيل-download--install) • [📸 Screenshots](#-معرض-صور-التطبيق-screenshots) • [🔐 Security](#-الأمان-والتشفير-security-architecture) • [🌐 Extensions](#-إضافة-المتصفحات-browser-extensions) • [📜 Privacy Policy](PRIVACY_POLICY.md)
 
@@ -153,7 +153,7 @@ npm run dist
 
 تم تصميم وهندسة وتطوير هذا المشروع بواسطة:
 
-### **Eng. Mohammed Al-Gunaid — المهندس محمد الجنيد**
+### **hmo**
 * **GitHub:** [@hmo175](https://github.com/hmo175)
 * **Repository:** [https://github.com/hmo175/my-safe](https://github.com/hmo175/my-safe)
 
@@ -161,4 +161,4 @@ npm run dist
 
 ## 📄 الترخيص | License
 
-هذا المشروع مرخص تحت رخصة **MIT License** — جميع الحقوق محفوظة © 2026 **Eng. Mohammed Al-Gunaid (@hmo175)**.
+هذا المشروع مرخص تحت رخصة **MIT License** — جميع الحقوق محفوظة © 2026 **hmo (@hmo175)**.

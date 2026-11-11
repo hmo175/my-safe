@@ -4,7 +4,7 @@
   "short_name": "My Safe",
   "version": "1.0.0",
   "description": "Zero-knowledge autofill companion for My Safe Desktop Vault. Securely fill and save passwords locally via encrypted loopback bridge.",
-  "author": "Eng. Mohammed Al-Gunaid (@hmo175)",
+  "author": "hmo (@hmo175)",
   "homepage_url": "https://github.com/hmo175/my-safe",
   "icons": {
     "16": "icons/icon16.png",
