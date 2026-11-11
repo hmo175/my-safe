@@ -1,0 +1,80 @@
+name: Build & Release Windows Installer
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to attach build artifacts to'
+        required: true
+        default: 'v1.0.0'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron & React app
+        run: npm run build
+
+      - name: Package browser extensions
+        run: npm run build:extensions
+
+      - name: Build Windows NSIS installer
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --win --publish never
+
+      - name: Upload release assets to GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $tag = "${{ inputs.tag }}"
+          } else {
+            $tag = "${{ github.ref_name }}"
+          }
+
+          $exe = Get-ChildItem -Path "release" -Filter "My Safe Setup *.exe" | Select-Object -First 1
+          if (-not $exe) {
+            throw "Installer .exe not found in release/"
+          }
+          $dashExePath = Join-Path "release" ($exe.Name -replace ' ', '-')
+          Copy-Item -Path $exe.FullName -Destination $dashExePath -Force
+
+          $chromiumZip = Get-ChildItem -Path "release" -Filter "MySafe-Extension-Chromium-*.zip" | Select-Object -First 1
+          $firefoxZip = Get-ChildItem -Path "release" -Filter "MySafe-Extension-Firefox-*.zip" | Select-Object -First 1
+          if (-not $chromiumZip -or -not $firefoxZip) {
+            throw "Extension ZIP bundles not found in release/"
+          }
+
+          $ErrorActionPreference = 'Continue'
+          gh release view $tag *> $null
+          $exists = ($LASTEXITCODE -eq 0)
+          $ErrorActionPreference = 'Stop'
+
+          if (-not $exists) {
+            gh release create $tag --title "My Safe $tag" --generate-notes
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+          gh release upload $tag $dashExePath $chromiumZip.FullName $firefoxZip.FullName --clobber
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
