@@ -1,4 +1,4 @@
-import { ipcMain, clipboard, BrowserWindow, dialog } from 'electron';
+import { ipcMain, clipboard, BrowserWindow, dialog, app, shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { VaultManager, VaultItem } from '../storage/vaultDb';
@@ -267,12 +267,31 @@ export function registerIpcHandlers(
     return true;
   });
 
-  // Pairing code management for Chrome Extension
+  // Pairing code management for Browser Extensions
   ipcMain.handle('bridge:getPairingCode', async () => {
     return bridgeServer?.getCurrentPairingCode() || '000000';
   });
 
   ipcMain.handle('bridge:generateNewCode', async () => {
     return bridgeServer?.generateNewPairingCode() || '000000';
+  });
+
+  ipcMain.handle('bridge:getExtensionPath', async (_, browserType: 'chromium' | 'firefox' = 'chromium') => {
+    const folderName = browserType === 'firefox' ? 'extension-firefox' : 'extension';
+    const packedPath = path.join(process.resourcesPath, folderName);
+    const devPath = path.join(process.cwd(), folderName);
+    return app.isPackaged && fs.existsSync(packedPath) ? packedPath : devPath;
+  });
+
+  ipcMain.handle('bridge:openExtensionFolder', async (_, browserType: 'chromium' | 'firefox' = 'chromium') => {
+    const folderName = browserType === 'firefox' ? 'extension-firefox' : 'extension';
+    const packedPath = path.join(process.resourcesPath, folderName);
+    const devPath = path.join(process.cwd(), folderName);
+    const targetPath = app.isPackaged && fs.existsSync(packedPath) ? packedPath : devPath;
+    if (fs.existsSync(targetPath)) {
+      await shell.openPath(targetPath);
+      return targetPath;
+    }
+    return '';
   });
 }

@@ -1,0 +1,63 @@
+{
+    "manifest_version":  3,
+    "name":  "My Safe - Digital Password Vault",
+    "short_name":  "My Safe",
+    "version":  "1.0.0",
+    "description":  "Zero-knowledge autofill companion for My Safe Desktop Vault. Securely fill and save passwords locally via encrypted loopback bridge.",
+    "author":  "Eng. Mohammed Al-Gunaid (@hmo175)",
+    "homepage_url":  "https://github.com/hmo175/my-safe",
+    "icons":  {
+                  "16":  "icons/icon16.png",
+                  "32":  "icons/icon32.png",
+                  "48":  "icons/icon48.png",
+                  "128":  "icons/icon128.png"
+              },
+    "permissions":  [
+                        "activeTab",
+                        "storage"
+                    ],
+    "host_permissions":  [
+                             "http://127.0.0.1/*"
+                         ],
+    "action":  {
+                   "default_popup":  "popup.html",
+                   "default_title":  "My Safe - الخزنة الرقمية",
+                   "default_icon":  {
+                                        "16":  "icons/icon16.png",
+                                        "32":  "icons/icon32.png",
+                                        "48":  "icons/icon48.png",
+                                        "128":  "icons/icon128.png"
+                                    }
+               },
+    "background":  {
+                       "scripts":  [
+                                       "background.js"
+                                   ]
+                   },
+    "content_scripts":  [
+                            {
+                                "matches":  [
+                                                "http://*/*",
+                                                "https://*/*"
+                                            ],
+                                "js":  [
+                                           "content.js"
+                                       ],
+                                "css":  [
+                                            "content.css"
+                                        ],
+                                "run_at":  "document_end"
+                            }
+                        ],
+    "browser_specific_settings":  {
+                                      "gecko":  {
+                                                    "id":  "mysafe@hmo175.github.io",
+                                                    "strict_min_version":  "140.0",
+                                                    "data_collection_permissions":  {
+                                                                                        "required":  [
+                                                                                                         "none"
+                                                                                                     ]
+                                                                                    }
+                                                }
+                                  }
+}

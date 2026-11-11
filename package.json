@@ -8,7 +8,8 @@
     "start": "electron .",
     "dev": "vite",
     "build": "tsc && vite build && powershell -Command \"New-Item -ItemType Directory -Force -Path dist-electron/biometrics; Copy-Item src/main/biometrics/winHello.ps1 dist-electron/biometrics/winHello.ps1 -Force; Copy-Item resources/tray.png dist-electron/tray.png -Force\"",
-    "dist": "npm run build && electron-builder --win",
+    "build:extensions": "powershell -ExecutionPolicy Bypass -File scripts/buildExtensions.ps1",
+    "dist": "npm run build && npm run build:extensions && electron-builder --win",
     "preview": "vite preview"
   },
   "keywords": [
@@ -60,6 +61,10 @@
     ],
     "asarUnpack": [
       "dist-electron/biometrics/**/*"
+    ],
+    "extraResources": [
+      { "from": "extension", "to": "extension" },
+      { "from": "extension-firefox", "to": "extension-firefox" }
     ],
     "win": {
       "target": [

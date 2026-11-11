@@ -1,33 +1,55 @@
+// My Safe Popup Controller (Chromium & Firefox Compatible)
+// Author: Eng. Mohammed Al-Gunaid (@hmo175)
+
+const ext = typeof browser !== 'undefined' ? browser : chrome;
+
+function getActiveTab() {
+  return new Promise((resolve) => {
+    try {
+      ext.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        resolve(tabs && tabs[0] ? tabs[0] : null);
+      });
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+function renderMessage(container, text, color) {
+  container.textContent = '';
+  const msg = document.createElement('div');
+  msg.style.cssText = `text-align: center; padding: 20px; font-size: 11px; color: ${color}; line-height: 1.6;`;
+  msg.textContent = text;
+  container.appendChild(msg);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const statusDot = document.getElementById('statusDot');
   const pairSection = document.getElementById('pairSection');
   const connectedSection = document.getElementById('connectedSection');
   const pairCodeInput = document.getElementById('pairCodeInput');
+  const pairError = document.getElementById('pairError');
   const pairBtn = document.getElementById('pairBtn');
   const currentDomainEl = document.getElementById('currentDomain');
   const accountsListEl = document.getElementById('accountsList');
 
-  // Query active tab URL
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  let currentUrl = tab?.url || '';
-  let domain = '';
+  const tab = await getActiveTab();
+  const currentUrl = (tab && tab.url) ? tab.url : '';
   try {
     const parsed = new URL(currentUrl);
-    domain = parsed.hostname;
-    currentDomainEl.textContent = domain;
+    currentDomainEl.textContent = parsed.hostname || 'غير محدد';
   } catch {
     currentDomainEl.textContent = 'غير محدد';
   }
 
-  // Check connection status
-  chrome.runtime.sendMessage({ action: 'checkStatus' }, (res) => {
+  ext.runtime.sendMessage({ action: 'checkStatus' }, (res) => {
     if (!res || !res.success) {
       statusDot.className = 'status-dot disconnected';
-      accountsListEl.innerHTML = `
-        <div style="text-align: center; padding: 20px; font-size: 11px; color: #EF4444;">
-          برنامج سطح المكتب غير متصل.<br>يرجى فتح My Safe على جهازك.
-        </div>
-      `;
+      renderMessage(
+        accountsListEl,
+        'برنامج سطح المكتب غير متصل. يرجى فتح My Safe على جهازك.',
+        '#EF4444'
+      );
       return;
     }
 
@@ -42,30 +64,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     pairSection.style.display = 'none';
     connectedSection.style.display = 'block';
 
-    // Fetch accounts for current tab
-    chrome.runtime.sendMessage({ action: 'getMatchingAccounts', url: currentUrl }, (matchRes) => {
+    ext.runtime.sendMessage({ action: 'getMatchingAccounts', url: currentUrl }, (matchRes) => {
       if (!matchRes || !matchRes.accounts || matchRes.accounts.length === 0) {
-        accountsListEl.innerHTML = `
-          <div style="text-align: center; padding: 20px; font-size: 11px; color: #6B7280;">
-            لا توجد حسابات مسجلة لهذا الرابط في الخزنة.
-          </div>
-        `;
+        renderMessage(
+          accountsListEl,
+          'لا توجد حسابات مسجلة لهذا الرابط في الخزنة.',
+          '#6B7280'
+        );
         return;
       }
 
-      accountsListEl.innerHTML = '';
+      accountsListEl.textContent = '';
       matchRes.accounts.forEach((acc) => {
         const item = document.createElement('div');
         item.className = 'account-item';
-        item.innerHTML = `
-          <div class="account-title">${acc.title}</div>
-          <div class="account-user">${acc.username || acc.email || '••••••'}</div>
-        `;
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'account-title';
+        titleDiv.textContent = acc.title || '';
+
+        const userDiv = document.createElement('div');
+        userDiv.className = 'account-user';
+        userDiv.textContent = acc.username || acc.email || '••••••';
+
+        item.appendChild(titleDiv);
+        item.appendChild(userDiv);
+
         item.addEventListener('click', () => {
-          chrome.tabs.sendMessage(tab.id, {
-            action: 'autofillFromPopup',
-            accountId: acc.id,
-          });
+          if (tab && tab.id !== undefined) {
+            ext.tabs.sendMessage(tab.id, {
+              action: 'autofillFromPopup',
+              accountId: acc.id,
+            });
+          }
           window.close();
         });
         accountsListEl.appendChild(item);
@@ -75,14 +106,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   pairBtn.addEventListener('click', () => {
     const code = pairCodeInput.value.trim();
-    if (code.length === 6) {
-      chrome.runtime.sendMessage({ action: 'pair', code }, (pairRes) => {
-        if (pairRes && pairRes.success) {
-          window.location.reload();
-        } else {
-          alert('كود الاقتران غير صحيح، يرجى التأكد من الكود الظاهر في تطبيق سطح المكتب.');
-        }
-      });
+    pairError.style.display = 'none';
+
+    if (code.length !== 6) {
+      pairError.textContent = 'يرجى إدخال رمز الاقتران المكون من 6 أرقام.';
+      pairError.style.display = 'block';
+      return;
     }
+
+    ext.runtime.sendMessage({ action: 'pair', code }, (pairRes) => {
+      if (pairRes && pairRes.success) {
+        window.location.reload();
+      } else {
+        pairError.textContent = 'كود الاقتران غير صحيح، يرجى التأكد من الكود الظاهر في تطبيق سطح المكتب.';
+        pairError.style.display = 'block';
+      }
+    });
   });
 });

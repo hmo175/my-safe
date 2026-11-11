@@ -25,6 +25,8 @@ export interface MySafeAPI {
   exportFile: (storedFileName: string, defaultName: string) => Promise<boolean>;
   getPairingCode: () => Promise<string>;
   generateNewPairingCode: () => Promise<string>;
+  getExtensionPath: (browserType?: 'chromium' | 'firefox') => Promise<string>;
+  openExtensionFolder: (browserType?: 'chromium' | 'firefox') => Promise<string>;
   onAutoLocked: (callback: () => void) => () => void;
   notifyActivity: () => void;
 }
@@ -54,6 +56,8 @@ const api: MySafeAPI = {
   exportFile: (storedFileName: string, defaultName: string) => ipcRenderer.invoke('vault:exportFile', { storedFileName, defaultName }),
   getPairingCode: () => ipcRenderer.invoke('bridge:getPairingCode'),
   generateNewPairingCode: () => ipcRenderer.invoke('bridge:generateNewCode'),
+  getExtensionPath: (browserType?: 'chromium' | 'firefox') => ipcRenderer.invoke('bridge:getExtensionPath', browserType),
+  openExtensionFolder: (browserType?: 'chromium' | 'firefox') => ipcRenderer.invoke('bridge:openExtensionFolder', browserType),
   onAutoLocked: (callback: () => void) => {
     const handler = () => callback();
     ipcRenderer.on('vault:autoLocked', handler);

@@ -1,28 +1,49 @@
-// My Safe Extension Background Service Worker
+// My Safe Extension - Universal Background Worker / Script (Chromium & Firefox)
+// Author: Eng. Mohammed Al-Gunaid (@hmo175)
+
+const ext = typeof browser !== 'undefined' ? browser : chrome;
 const BRIDGE_URL = 'http://127.0.0.1:48521';
-let pairedToken = null;
 
-// Load saved pairing token
-chrome.storage.local.get(['mysafe_token'], (res) => {
-  if (res.mysafe_token) {
-    pairedToken = res.mysafe_token;
-  }
-});
+function getStoredToken() {
+  return new Promise((resolve) => {
+    try {
+      ext.storage.local.get(['mysafe_token'], (res) => {
+        resolve((res && res.mysafe_token) ? res.mysafe_token : '');
+      });
+    } catch {
+      resolve('');
+    }
+  });
+}
 
-// Helper to query desktop app
+function setStoredToken(token) {
+  return new Promise((resolve) => {
+    try {
+      ext.storage.local.set({ mysafe_token: token }, () => resolve(true));
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
+// Helper to query local My Safe desktop bridge
 async function queryDesktop(endpoint, body = {}) {
   try {
+    const token = await getStoredToken();
     const res = await fetch(`${BRIDGE_URL}${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-MySafe-Token': pairedToken || '',
+        'X-MySafe-Token': token,
       },
       body: JSON.stringify(body),
     });
     return await res.json();
-  } catch (err) {
-    return { success: false, error: 'تعذر الاتصال ببرنامج My Safe لسطح المكتب. تأكد أن البرنامج مفتوح.' };
+  } catch {
+    return {
+      success: false,
+      error: 'تعذر الاتصال ببرنامج My Safe لسطح المكتب. تأكد أن البرنامج يعمل.',
+    };
   }
 }
 
@@ -40,34 +61,32 @@ function extractDomain(url) {
   }
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+ext.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  if (!request || !request.action) return false;
+
   if (request.action === 'getMatchingAccounts') {
     const domain = extractDomain(request.url);
-    queryDesktop('/api/matches', { url: request.url, domain }).then((res) => {
-      sendResponse(res);
-    });
-    return true; // Keep channel open for async response
+    queryDesktop('/api/matches', { url: request.url, domain }).then(sendResponse);
+    return true;
   }
 
   if (request.action === 'requestAutofill') {
-    queryDesktop('/api/autofill', { accountId: request.accountId, url: request.url }).then((res) => {
-      sendResponse(res);
-    });
+    queryDesktop('/api/autofill', {
+      accountId: request.accountId,
+      url: request.url,
+    }).then(sendResponse);
     return true;
   }
 
   if (request.action === 'checkStatus') {
-    queryDesktop('/api/status').then((res) => {
-      sendResponse(res);
-    });
+    queryDesktop('/api/status').then(sendResponse);
     return true;
   }
 
   if (request.action === 'pair') {
-    queryDesktop('/api/pair', { code: request.code }).then((res) => {
+    queryDesktop('/api/pair', { code: request.code }).then(async (res) => {
       if (res && res.success && res.token) {
-        pairedToken = res.token;
-        chrome.storage.local.set({ mysafe_token: res.token });
+        await setStoredToken(res.token);
       }
       sendResponse(res);
     });
@@ -75,9 +94,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === 'autoSaveAccount') {
-    queryDesktop('/api/saveAccount', request.account).then((res) => {
-      sendResponse(res);
-    });
+    queryDesktop('/api/saveAccount', request.account).then(sendResponse);
     return true;
   }
+
+  return false;
 });

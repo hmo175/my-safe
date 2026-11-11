@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Globe, RefreshCw, CheckCircle, ShieldCheck, Copy, Check } from 'lucide-react';
+import { X, Globe, RefreshCw, ShieldCheck, Copy, Check, FolderOpen } from 'lucide-react';
 import { Translations } from '../../locales/translations';
 
 interface ExtensionPairModalProps {
@@ -8,6 +8,8 @@ interface ExtensionPairModalProps {
   onClose: () => void;
 }
 
+type BrowserTab = 'chromium' | 'firefox';
+
 export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
   isOpen,
   onClose,
@@ -15,6 +17,8 @@ export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
   const [pairingCode, setPairingCode] = useState('------');
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [browserTab, setBrowserTab] = useState<BrowserTab>('chromium');
+  const [extPath, setExtPath] = useState('');
 
   const fetchCode = async () => {
     if (window.mySafe) {
@@ -27,6 +31,12 @@ export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
       }
     }
   };
+
+  useEffect(() => {
+    if (isOpen && window.mySafe?.getExtensionPath) {
+      window.mySafe.getExtensionPath(browserTab).then(setExtPath);
+    }
+  }, [isOpen, browserTab]);
 
   const handleRegenerate = async () => {
     if (window.mySafe) {
@@ -69,8 +79,8 @@ export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
               <Globe className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm">ربط إضافة متصفح Google Chrome</h3>
-              <span className="text-[11px] text-gray-400">للتعبئة التلقائية السريعة لكلمات المرور</span>
+              <h3 className="font-bold text-white text-sm">ربط إضافة المتصفحات (جميع المتصفحات)</h3>
+              <span className="text-[11px] text-gray-400">Chrome • Edge • Brave • Opera • Firefox</span>
             </div>
           </div>
           <button
@@ -81,25 +91,96 @@ export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
           </button>
         </div>
 
+        {/* Browser Type Switcher */}
+        <div className="flex gap-2 mt-4">
+          <button
+            type="button"
+            onClick={() => setBrowserTab('chromium')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold border transition-all ${
+              browserTab === 'chromium'
+                ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400'
+                : 'bg-[#090D14] border-gray-800 text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            Chrome / Edge / Brave / Opera
+          </button>
+          <button
+            type="button"
+            onClick={() => setBrowserTab('firefox')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold border transition-all ${
+              browserTab === 'firefox'
+                ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400'
+                : 'bg-[#090D14] border-gray-800 text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            Mozilla Firefox
+          </button>
+        </div>
+
         {/* Instructions */}
-        <div className="my-5 space-y-3 text-xs text-gray-300">
-          <div className="p-3.5 rounded-xl bg-[#090D14] border border-gray-800 space-y-2">
-            <div className="flex items-start gap-2">
-              <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
-              <span>افتح متصفح كروم وتوجه إلى صفحة الإضافات: <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded">chrome://extensions/</code></span>
+        <div className="my-4 space-y-3 text-xs text-gray-300">
+          {browserTab === 'chromium' ? (
+            <div className="p-3.5 rounded-xl bg-[#090D14] border border-gray-800 space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                <span>
+                  افتح صفحة الإضافات في متصفحك:{' '}
+                  <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded">chrome://extensions</code>{' '}
+                  أو <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded">edge://extensions</code>{' '}
+                  أو <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded">brave://extensions</code>
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                <span>فعّل خيار <strong>وضع المطور (Developer Mode)</strong> في الزاوية العلوية.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
+                <span>
+                  اضغط <strong>Load unpacked (تحميل حزمة غير مضغوطة)</strong> واختر مجلد <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded font-mono">extension</code> (أو ثبّتها مباشرة من المتجر الرسمي فور النشر).
+                </span>
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
-              <span>فعل خيار <strong>وضع مطور البرامج (Developer Mode)</strong> في أعلى الزاوية.</span>
+          ) : (
+            <div className="p-3.5 rounded-xl bg-[#090D14] border border-gray-800 space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                <span>
+                  في متصفح Firefox انتقل إلى:{' '}
+                  <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded">about:debugging#/runtime/this-firefox</code>
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                <span>اضغط على <strong>Load Temporary Add-on</strong> (أو ثبّتها دائماً من متجر Firefox Add-ons بعد النشر).</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
+                <span>
+                  اختر ملف <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded font-mono">extension-firefox/manifest.json</code>.
+                </span>
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="w-5 h-5 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
-              <span>اضغط <strong>"تحميل ملف مفكك" (Load Unpacked)</strong> واختر مجلد: <code className="text-emerald-400 bg-gray-900 px-1 py-0.5 rounded font-mono">D:\Programming\My Safe\extension</code></span>
+          )}
+
+          {extPath && (
+            <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[#090D14] border border-gray-800/80">
+              <span className="text-[10px] text-gray-400 font-mono truncate" dir="ltr" title={extPath}>
+                {extPath}
+              </span>
+              <button
+                type="button"
+                onClick={() => window.mySafe?.openExtensionFolder?.(browserTab)}
+                className="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-emerald-400 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 shrink-0 transition-colors"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                <span>فتح المجلد</span>
+              </button>
             </div>
-          </div>
+          )}
 
           {/* Pairing Code Card */}
-          <div className="text-center pt-2">
+          <div className="text-center pt-1">
             <span className="block text-[11px] font-semibold text-gray-400 mb-2">
               كود الاقتران المؤقت (أدخله في نافذة الإضافة بالمتصفح):
             </span>
@@ -131,7 +212,7 @@ export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
         {/* Security Notice */}
         <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/20 flex items-center gap-2.5 text-[11px] text-emerald-300">
           <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-          <span>الربط مشفر ومحمي برمز لمرة واحدة لضمان عدم تجسس أي موقع أو إضافة أخرى على الخزنة.</span>
+          <span>الربط مشفر ومحمي برمز لمرة واحدة ويعمل محلياً عبر منفذ آمن دون خروج أي بيانات للإنترنت.</span>
         </div>
 
         {/* Footer */}
