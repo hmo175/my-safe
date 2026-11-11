@@ -323,7 +323,7 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-sky-400 hover:bg-sky-500/10 border border-sky-500/20 transition-all"
           >
             <Globe className="w-4 h-4" />
-            <span>ربط متصفح Chrome</span>
+            <span>{lang === 'ar' ? 'ربط إضافات المتصفح' : 'Browser Extensions'}</span>
           </button>
 
           <button

@@ -1,102 +1,164 @@
-# 🛡️ My Safe - الخزنة الرقمية فائقة الأمان
-### Ultra-Secure Desktop Password Manager & Digital Vault with Browser Autofill
-
 <div align="center">
 
-![My Safe Banner](https://img.shields.io/badge/Security-Argon2id%20%2B%20AES--256--GCM-10B981?style=for-the-badge)
-![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-blue?style=for-the-badge&logo=windows)
-![Framework](https://img.shields.io/badge/Framework-Electron%20%2B%20React%20%2B%20Tailwind-61DAFB?style=for-the-badge&logo=react)
-![License](https://img.shields.io/badge/License-MIT-amber?style=for-the-badge)
+<img src="docs/images/banner.jpg" alt="My Safe Hero Banner" width="100%" />
+
+<br/><br/>
+
+# 🛡️ My Safe — الخزنة الرقمية فائقة الأمان
+### Zero-Knowledge Desktop Password Manager, Encrypted File Vault & Cross-Browser Autofill
+
+[![Security](https://img.shields.io/badge/Encryption-Argon2id%20%2B%20AES--256--GCM-10B981?style=for-the-badge)](https://github.com/hmo175/my-safe)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-0EA5E9?style=for-the-badge&logo=windows)](https://github.com/hmo175/my-safe)
+[![Browsers](https://img.shields.io/badge/Extensions-Chrome%20%7C%20Edge%20%7C%20Firefox%20%7C%20Brave%20%7C%20Opera-8B5CF6?style=for-the-badge)](https://github.com/hmo175/my-safe)
+[![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](https://github.com/hmo175/my-safe)
 
 <br/>
 
-**Created & Developed by [Eng. Mohammed Al-Gunaid](https://github.com/hmo175)**  
-GitHub: [@hmo175](https://github.com/hmo175)
+**Designed & Engineered by [Eng. Mohammed Al-Gunaid](https://github.com/hmo175) (`@hmo175`)**
+
+[📥 Download Installer](#-التحميل-والتشغيل-download--install) • [📸 Screenshots](#-معرض-صور-التطبيق-screenshots) • [🔐 Security](#-الأمان-والتشفير-security-architecture) • [🌐 Extensions](#-إضافة-المتصفحات-browser-extensions) • [📜 Privacy Policy](PRIVACY_POLICY.md)
 
 </div>
 
 ---
 
-## 🌟 نبذة عن المشروع (About My Safe)
+## 🌟 نبذة عن المشروع | About My Safe
 
-**My Safe** هو تطبيق سطح مكتب متكامل لإدارة كلمات المرور وحفظ الملفات والمستندات الحساسة بأعلى معايير التشفير العسكرية العالمية. صُمم التطبيق بنظام **المعرفة الصفرية (Zero-Knowledge)** والتخزين المحلي المحمي بالكامل داخل جهاز المستخدم، مع تكامل مباشر مع بصمة الويندوز **(Windows Hello)** وإضافة متصفح ذكية للتعبئة التلقائية وحفظ الحسابات في المتصفحات الشائعة (Chrome, Edge, Brave, Opera).
+**My Safe** هو تطبيق سطح مكتب متكامل وعالي الأمان لإدارة كلمات المرور، البطاقات البنكية، الملاحظات السرية، وحفظ المستندات الحساسة (PDF & Images) بتشفير محلي 100% وفق مبدأ **المعرفة الصفرية (Zero-Knowledge)**.
 
----
-
-## 🚀 الميزات الرئيسية (Key Features)
-
-* **🔐 تشفير عسكري معتمد:**
-  * اشتقاق المفاتيح بخوارزمية **Argon2id** المقاومة لهجمات كروت الشاشة و ASIC.
-  * تشفير السجلات والملفات بنظام **AES-256-GCM** مع ختم سلامة ومقاومة التلاعب.
-  * مفتاح استرداد طارئ مكون من 32 رمزاً في حال نسيان كلمة المرور الرئيسية.
-
-* **🖐️ المصادقة البيومترية (Windows Hello):**
-  * دعم كامل وفوري لبصمة الإصبع، التعرف على الوجه، أو رمز PIN عبر واجهات WinRT الرسمية.
-  * تفعيل تلقائي ذكي وفك قفل فوري للخزنة.
-
-* **🌐 التكامل التام مع جميع المتصفحات (Chrome / Edge / Brave / Opera / Vivaldi / Firefox):**
-  * إضافة متصفح متوافقة مع **Manifest V3** لمتصفحات Chromium ومتصفح Mozilla Firefox.
-  * كشف حقول الدخول وإظهار أيقونة الخزنة داخل الحقول.
-  * **تأكيد إلزامي بالبصمة** على سطح المكتب قبل تعبئة كلمات المرور لحمايتك من التجسس.
-  * **الحفظ التلقائي (Auto-Save):** رصد الحسابات الجديدة عند تسجيل الدخول وعرض نافذة لحفظها بنقرة واحدة.
-  * راجع [دليل نشر الإضافة على متاجر المتصفحات](STORE_PUBLISHING_GUIDE.md) و[سياسة الخصوصية](PRIVACY_POLICY.md).
-
-* **📂 خزنة الملفات وعارض المستندات السري (In-App RAM Viewer):**
-  * تشفير ملفات PDF، صور الجوازات، والهويات وحفظها داخل مجلد الخزنة المشفر.
-  * فك تشفير الملفات **في الذاكرة العشوائية (RAM) فقط** لمعاينتها داخل التطبيق دون إنشاء ملفات غير مشفرة على القرص الصلب نهائياً.
-
-* **⚙️ صينية النظام والبقاء في الخلفية (System Tray):**
-  * عند الضغط على إغلاق `(X)`، يستمر التطبيق بالعمل بأيقونة درع خضراء بجوار ساعة الويندوز، لضمان استمرار عمل الإضافة والتعبئة الفورية في أي وقت.
-
-* **⚡ أدوات الأمان المدمجة:**
-  * **مولد أكواد 2FA / TOTP:** مولد رموز تحقق بخطوتين دوار كل 30 ثانية (بديل متكامل لـ Google Authenticator).
-  * **مولد كلمات المرور:** تخصيص الطول والرموز مع شريط قياس القوة.
-  * **استيراد وتصدير شامل:** استيراد جميع كلمات المرور من Chrome و Edge بملف CSV بنقرة واحدة، وتصدير نسخ احتياطية مشفرة بصيغة `.mysafe`.
-  * **واجهة ثنائية اللغة:** دعم كامل للعربية (RTL) والإنجليزية (LTR).
+**My Safe** is a local-first, zero-knowledge digital vault for Windows 10/11 built with **Electron, React, TypeScript & Tailwind CSS**. All encryption happens strictly offline on your machine using **Argon2id** + **AES-256-GCM**, paired with native **Windows Hello** biometrics, a live **2FA (TOTP)** authenticator, an in-memory **RAM File Viewer**, and a **Manifest V3** browser extension for Chrome, Edge, Brave, Opera, Vivaldi, and Mozilla Firefox.
 
 ---
 
-## 🛠️ البنية التقنية (Tech Stack)
+## 📸 معرض صور التطبيق | Screenshots
 
-* **محرك سطح المكتب:** Electron v36+ (Node.js)
-* **واجهة المستخدم:** React 18, TypeScript, Tailwind CSS v4, Lucide Icons
-* **خوارزميات التشفير:** Argon2id (WebAssembly / Native), AES-256-GCM, Scrypt
-* **التكامل البيومتري:** Windows Runtime (WinRT) `UserConsentVerifier`
-* **إضافة المتصفح:** Chromium Extensions API (Manifest V3)
+### 🖥️ لوحة التحكم الرئيسية ومولّد رموز التحقق (2FA Live Vault Dashboard)
+<div align="center">
+  <img src="docs/images/screen-dashboard.png" alt="My Safe Dashboard with live 2FA TOTP" width="95%" />
+</div>
+
+<br/>
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <b>🖐️ قفل البصمة (Windows Hello Biometrics)</b><br/><br/>
+      <img src="docs/images/screen-unlock.png" alt="Windows Hello Unlock Screen" width="100%" />
+    </td>
+    <td width="50%" align="center">
+      <b>⚙️ الإعدادات والقفل التلقائي (Auto-Lock & Security)</b><br/><br/>
+      <img src="docs/images/screen-settings.png" alt="Settings & Auto-Lock Controls" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <b>🌐 ربط جميع المتصفحات (Multi-Browser Pairing)</b><br/><br/>
+      <img src="docs/images/screen-pairing.png" alt="Multi-Browser Extension Pairing" width="100%" />
+    </td>
+    <td width="50%" align="center">
+      <b>🧩 نافذة إضافة المتصفح (Extension Popup)</b><br/><br/>
+      <img src="docs/images/screen-extension.png" alt="Browser Extension Popup UI" width="65%" />
+    </td>
+  </tr>
+</table>
 
 ---
 
-## 💻 التشغيل والتثبيت (Getting Started)
+## 🚀 الميزات الرئيسية | Key Features
 
-### المتطلبات:
-* نظام التشغيل: Windows 10 أو Windows 11.
-* بيئة Node.js (v18 فما فوق).
+* **🔐 تشفير عسكري معتمد (Zero-Knowledge Cryptography):**
+  * اشتقاق المفاتيح بخوارزمية **Argon2id** (`64 MB` memory cost, `3` iterations, `4` parallelism) المقاومة لهجمات GPU وASIC.
+  * تشفير جميع السجلات والملفات والنسخ الاحتياطية بخوارزمية **AES-256-GCM** مع ختم سلامة (Auth Tag) يمنع التلاعب.
+  * **مفتاح استرداد طارئ (32-Char Crockford Base32)** لاسترجاع الخزنة عند نسيان كلمة المرور الرئيسية.
+  * إمكانية تغيير كلمة المرور الرئيسية مع إعادة تشفير الخزنة بالكامل بملح جديد.
 
-### خطوات التشغيل:
+* **🖐️ المصادقة البيومترية (Native Windows Hello):**
+  * تكامل مباشر مع واجهات **WinRT (`UserConsentVerifier`)** لبصمة الإصبع، التعرف على الوجه، أو رمز Windows PIN.
+  * تفعيل ذكي تلقائي وتأكيد فوري عند فك قفل الخزنة.
+
+* **🛡️ الحماية الذكية والقفل التلقائي (Smart Auto-Lock & Tray Service):**
+  * **بقاء في الخلفية:** تصغير أنيق لصينية النظام بجانب ساعة الويندوز لخدمة المتصفح باستمرار دون إزعاج.
+  * **قفل تلقائي بعد 5 دقائق خمول** (قابل للتخصيص: `1 / 5 / 10 / 15 دقيقة`).
+  * **قفل فوري** عند الإغلاق إلى الخلفية `(X)`، تصغير النافذة، قفل شاشة الويندوز (`Win + L`)، أو وضع السكون (`Sleep`).
+  * **مسح تلقائي للحافظة** بعد 30 ثانية من نسخ أي كلمة مرور.
+
+* **🌐 إضافة متصفحات متوافقة بالكامل (All Major Browsers — Manifest V3):**
+  * متوافقة مع **Google Chrome, Microsoft Edge, Brave, Opera, Vivaldi, Mozilla Firefox**.
+  * كشف ذكي لحقول تسجيل الدخول وظهور أيقونة الدرع داخل الحقل للتعبئة بنقرة واحدة.
+  * **نافذة تأكيد أمان إلزامية** على سطح المكتب قبل إرسال أي كلمة مرور للمتصفح.
+  * **الحفظ التلقائي (Auto-Save Banner)** عند تسجيل الدخول أو إنشاء حساب جديد.
+
+* **📂 خزنة الملفات وعارض المستندات السري (In-Memory RAM Viewer):**
+  * تشفير ملفات PDF، الجوازات، العقود، والصور وحفظها مشفرة على القرص.
+  * فك التشفير وعرض الملفات **داخل الذاكرة العشوائية (RAM) فقط** دون كتابة أي نسخة مكشوفة على القرص الصلب.
+
+* **⚡ أدوات احترافية مدمجة:**
+  * **مولّد أكواد 2FA / TOTP** دوار كل 30 ثانية مع عداد حي.
+  * **مولّد كلمات مرور قوية** مع قياس القوة وتخصيص الخانات.
+  * **نقل البيانات بضغطة زر:** استيراد فوري لكلمات المرور من **Chrome / Edge / Bitwarden (CSV)** + تصدير نسخ احتياطية مشفرة `.mysafe`.
+  * **واجهة ثنائية اللغة:** دعم كامل للعربية (**RTL**) والإنجليزية (**LTR**).
+
+---
+
+## 🧱 البنية التقنية | Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Desktop Shell** | Electron v45 (Node.js, ContextBridge, `powerMonitor`, Tray) |
+| **Frontend UI** | React 19, TypeScript, Tailwind CSS v4, Lucide Icons |
+| **Cryptography** | `hash-wasm` (Argon2id), Node `crypto` AES-256-GCM, Scrypt |
+| **Biometrics** | Native Windows Runtime (`UserConsentVerifier`) |
+| **Browser Extensions** | Manifest V3 (`extension/` Chromium & `extension-firefox/` AMO) |
+
+---
+
+## 📥 التحميل والتشغيل | Download & Install
+
+### للمستخدمين النهائيين (تثبيت مباشر بدون متطلبات):
+1. حمّل ملف التثبيت **`My Safe Setup 1.0.0.exe`** من قسم [**Releases**](https://github.com/hmo175/my-safe/releases).
+2. شغّل المثبّت لتنزيل البرنامج مع اختصار رسمي على سطح المكتب وقائمة ابدأ.
+3. لتفعيل إضافة المتصفح، افتح **"ربط إضافات المتصفح"** داخل البرنامج واتبع الخطوات الموضحة بالداخل.
+
+### للمطورين (التشغيل من الكود المصدري):
 ```bash
-# 1. تثبيت الحزم
+# 1. استنساخ المستودع
+git clone https://github.com/hmo175/my-safe.git
+cd my-safe
+
+# 2. تثبيت الحزم
 npm install
 
-# 2. بناء وتجميع المشروع
+# 3. بناء التطبيق وحزم إضافات المتصفح
 npm run build
+npm run build:extensions
 
-# 3. تشغيل التطبيق
+# 4. تشغيل التطبيق
 npm start
-# أو تشغيل الملف المباشر: Run-MySafe.bat
+# أو لتوليد ملف التثبيت exe:
+npm run dist
 ```
 
 ---
 
-## 👤 حقوق المطور والملكية الفكرية (Author & Credits)
+## 🌐 إضافة المتصفحات | Browser Extensions
 
-تم تصميم وهندسة وتطوير هذا المشروع بواسطة:
-
-### **المهندس: محمد الجنيد (Eng. Mohammed Al-Gunaid)**
-* **GitHub:** [@hmo175](https://github.com/hmo175)
-* **المشروع:** [My Safe Repository](https://github.com/hmo175/my-safe)
+* مجلد **Chrome / Edge / Brave / Opera / Vivaldi:** [`extension/`](extension)
+* مجلد **Mozilla Firefox:** [`extension-firefox/`](extension-firefox)
+* سياسة الخصوصية: [`PRIVACY_POLICY.md`](PRIVACY_POLICY.md)
+* دليل النشر في متاجر المتصفحات: [`STORE_PUBLISHING_GUIDE.md`](STORE_PUBLISHING_GUIDE.md)
 
 ---
 
-## 📄 الترخيص (License)
+## 👤 المطور وحقوق الملكية | Author & Credits
 
-هذا المشروع مرخص تحت رخصة **MIT License** - حقوق الملكية محفوظة © 2026 المهندس محمد الجنيد (Eng. Mohammed Al-Gunaid).
+تم تصميم وهندسة وتطوير هذا المشروع بواسطة:
+
+### **Eng. Mohammed Al-Gunaid — المهندس محمد الجنيد**
+* **GitHub:** [@hmo175](https://github.com/hmo175)
+* **Repository:** [https://github.com/hmo175/my-safe](https://github.com/hmo175/my-safe)
+
+---
+
+## 📄 الترخيص | License
+
+هذا المشروع مرخص تحت رخصة **MIT License** — جميع الحقوق محفوظة © 2026 **Eng. Mohammed Al-Gunaid (@hmo175)**.
