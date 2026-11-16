@@ -23,6 +23,9 @@ import {
   Download,
   Settings,
   KeyRound,
+  Folder,
+  FolderPlus,
+  X,
 } from 'lucide-react';
 import { Translations } from '../../locales/translations';
 import { ItemEditModal } from './ItemEditModal';
@@ -58,6 +61,8 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
   const [isPairModalOpen, setIsPairModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [isAddingFolder, setIsAddingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
 
   // Copy states
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -70,6 +75,9 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
   });
 
   const items = vaultData?.items || [];
+  const folders: string[] = vaultData?.folders && vaultData.folders.length > 0
+    ? vaultData.folders
+    : ['شخصي', 'العمل', 'مالي'];
 
   // Filter items
   const filteredItems = items.filter((item: any) => {
@@ -79,6 +87,10 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
     if (selectedCategory === 'notes' && item.type !== 'note') return false;
     if (selectedCategory === 'files' && item.type !== 'file') return false;
     if (selectedCategory === 'favorites' && !item.favorite) return false;
+    if (selectedCategory.startsWith('folder:')) {
+      const targetFolder = selectedCategory.slice(7);
+      if (item.folder !== targetFolder) return false;
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -129,11 +141,37 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
     setTimeout(() => setCopiedField(null), 2500);
   };
 
-  const handleUploadFile = async () => {
+  const handleUploadFiles = async () => {
     if (window.mySafe) {
-      const fileItem = await window.mySafe.selectAndUploadFile();
-      if (fileItem) {
-        setSelectedItemId(fileItem.id);
+      const activeFolder = selectedCategory.startsWith('folder:') ? selectedCategory.slice(7) : 'شخصي';
+      const fileItems = await window.mySafe.selectAndUploadFiles(activeFolder);
+      if (fileItems && fileItems.length > 0) {
+        setSelectedItemId(fileItems[0].id);
+        onRefreshData();
+      }
+    }
+  };
+
+  const handleAddFolder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newFolderName.trim();
+    if (!trimmed) return;
+    if (window.mySafe) {
+      await window.mySafe.addFolder(trimmed);
+      setNewFolderName('');
+      setIsAddingFolder(false);
+      onRefreshData();
+    }
+  };
+
+  const handleDeleteFolder = async (folderName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(lang === 'ar' ? `هل أنت متأكد من حذف قسم "${folderName}"؟` : `Delete folder "${folderName}"?`)) {
+      if (window.mySafe) {
+        await window.mySafe.deleteFolder(folderName);
+        if (selectedCategory === `folder:${folderName}`) {
+          setSelectedCategory('all');
+        }
         onRefreshData();
       }
     }
@@ -305,6 +343,91 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
                 {items.filter((i: any) => i.favorite).length}
               </span>
             </button>
+
+            {/* Custom Folders / Sections */}
+            <div className="pt-3 mt-2 border-t border-gray-800/80">
+              <div className="flex items-center justify-between px-1 mb-2">
+                <span className="text-[11px] font-bold text-gray-400">
+                  {lang === 'ar' ? 'الأقسام والمجلدات' : 'Custom Sections'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingFolder(!isAddingFolder)}
+                  className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition-colors"
+                  title={lang === 'ar' ? 'إضافة قسم جديد' : 'New Section'}
+                >
+                  <FolderPlus className="w-3.5 h-3.5" />
+                  <span>{lang === 'ar' ? 'قسم جديد' : 'Add'}</span>
+                </button>
+              </div>
+
+              {isAddingFolder && (
+                <form onSubmit={handleAddFolder} className="mb-2 flex items-center gap-1">
+                  <input
+                    type="text"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    placeholder={lang === 'ar' ? 'اسم القسم (مثال: شخصي)...' : 'Section name...'}
+                    autoFocus
+                    className="w-full bg-[#111723] border border-emerald-500/50 rounded-lg px-2.5 py-1 text-xs text-white placeholder-gray-500 focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="p-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs shrink-0"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingFolder(false);
+                      setNewFolderName('');
+                    }}
+                    className="p-1 bg-gray-800 hover:bg-gray-700 text-gray-400 rounded-lg text-xs shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              )}
+
+              <div className="space-y-1">
+                {folders.map((f) => {
+                  const isSelected = selectedCategory === `folder:${f}`;
+                  const count = items.filter((i: any) => i.folder === f).length;
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setSelectedCategory(`folder:${f}`)}
+                      className={`w-full group flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                        isSelected
+                          ? 'bg-emerald-600/15 text-emerald-400 border border-emerald-500/30'
+                          : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <Folder className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-emerald-400' : 'text-gray-500 group-hover:text-gray-400'}`} />
+                        <span className="truncate">{f}</span>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[10px] bg-gray-800 px-1.5 py-0.2 rounded text-gray-400 font-mono">
+                          {count}
+                        </span>
+                        {f !== 'شخصي' && f !== 'العمل' && (
+                          <span
+                            onClick={(e) => handleDeleteFolder(f, e)}
+                            className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-rose-400 transition-opacity"
+                            title={lang === 'ar' ? 'حذف القسم' : 'Delete'}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </nav>
         </div>
 
@@ -380,8 +503,8 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
           </div>
 
           <button
-            onClick={handleUploadFile}
-            title="رفع وتشفير ملف جديد"
+            onClick={handleUploadFiles}
+            title={lang === 'ar' ? 'إرفاق وتشفير ملفات بأمان' : 'Attach & Encrypt Files'}
             className="p-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl shadow-md transition-all shrink-0 flex items-center gap-1.5"
           >
             <UploadCloud className="w-4 h-4" />
@@ -712,7 +835,7 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
                     </span>
                     <span>•</span>
                     <span className="text-emerald-400 font-sans font-medium flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5" /> مشفر بـ AES-256
+                      <ShieldCheck className="w-3.5 h-3.5" /> {lang === 'ar' ? 'مشفر ومحمي بأعلى درجات الأمان' : 'Securely Encrypted'}
                     </span>
                   </div>
 
@@ -722,7 +845,7 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
                       className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all"
                     >
                       <Eye className="w-4 h-4" />
-                      <span>معاينة آمنة في الذاكرة (RAM)</span>
+                      <span>{lang === 'ar' ? 'معاينة فورية وآمنة للمستند' : 'Quick Secure Preview'}</span>
                     </button>
                     <button
                       onClick={() => {
@@ -760,6 +883,7 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
 
       {/* Edit / Add Modal */}
       <ItemEditModal
+        key={editingItem ? editingItem.id : 'new-item'}
         t={t}
         lang={lang}
         isOpen={isEditModalOpen}
@@ -769,6 +893,7 @@ export const VaultDashboard: React.FC<VaultDashboardProps> = ({
         }}
         onSave={handleSaveItem}
         existingItem={editingItem}
+        availableFolders={folders}
       />
 
       {/* Standalone Password Generator */}

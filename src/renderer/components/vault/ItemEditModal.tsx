@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Globe, CreditCard, FileText, Paperclip, Eye, EyeOff, Sparkles, Shield, AlertCircle } from 'lucide-react';
 import { Translations } from '../../locales/translations';
 import { PasswordGeneratorModal } from '../tools/PasswordGeneratorModal';
@@ -10,6 +10,7 @@ interface ItemEditModalProps {
   onClose: () => void;
   onSave: (item: any) => void;
   existingItem?: any;
+  availableFolders?: string[];
 }
 
 export const ItemEditModal: React.FC<ItemEditModalProps> = ({
@@ -19,10 +20,11 @@ export const ItemEditModal: React.FC<ItemEditModalProps> = ({
   onClose,
   onSave,
   existingItem,
+  availableFolders = ['شخصي', 'العمل', 'مالي'],
 }) => {
   const [type, setType] = useState<'login' | 'card' | 'note' | 'file'>(existingItem?.type || 'login');
   const [title, setTitle] = useState(existingItem?.title || '');
-  const [folder, setFolder] = useState(existingItem?.folder || 'Personal');
+  const [folder, setFolder] = useState(existingItem?.folder || 'شخصي');
   
   // Login fields
   const [username, setUsername] = useState(existingItem?.username || '');
@@ -47,6 +49,46 @@ export const ItemEditModal: React.FC<ItemEditModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [error, setError] = useState('');
+
+  // Re-synchronize fields whenever existingItem changes or modal opens
+  useEffect(() => {
+    if (existingItem) {
+      setType(existingItem.type || 'login');
+      setTitle(existingItem.title || '');
+      setFolder(existingItem.folder || 'شخصي');
+      setUsername(existingItem.username || '');
+      setEmail(existingItem.email || '');
+      setPassword(existingItem.password || '');
+      setUrl(existingItem.url || '');
+      setTotpSecret(existingItem.totpSecret || '');
+      setCardholderName(existingItem.cardholderName || '');
+      setCardNumber(existingItem.cardNumber || '');
+      setExpiryMonth(existingItem.expiryMonth || '');
+      setExpiryYear(existingItem.expiryYear || '');
+      setCvv(existingItem.cvv || '');
+      setPin(existingItem.pin || '');
+      setContent(existingItem.content || '');
+      setNotes(existingItem.notes || '');
+    } else {
+      setType('login');
+      setTitle('');
+      setFolder('شخصي');
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setUrl('');
+      setTotpSecret('');
+      setCardholderName('');
+      setCardNumber('');
+      setExpiryMonth('');
+      setExpiryYear('');
+      setCvv('');
+      setPin('');
+      setContent('');
+      setNotes('');
+    }
+    setError('');
+  }, [existingItem, isOpen]);
 
   if (!isOpen) return null;
 
@@ -166,15 +208,17 @@ export const ItemEditModal: React.FC<ItemEditModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">المجلد</label>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  {lang === 'ar' ? 'القسم / المجلد' : 'Section / Folder'}
+                </label>
                 <select
                   value={folder}
                   onChange={(e) => setFolder(e.target.value)}
                   className="w-full bg-[#090D14] border border-gray-700/80 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
                 >
-                  <option value="Personal">شخصي (Personal)</option>
-                  <option value="Work">عمل (Work)</option>
-                  <option value="Finance">مالي (Finance)</option>
+                  {(availableFolders && availableFolders.length > 0 ? availableFolders : ['شخصي', 'العمل', 'مالي']).map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -254,7 +298,7 @@ export const ItemEditModal: React.FC<ItemEditModalProps> = ({
                     type="text"
                     value={totpSecret}
                     onChange={(e) => setTotpSecret(e.target.value)}
-                    placeholder="مفتاح Base32 (مثال: JBSWY3DPEHPK3PXP)"
+                    placeholder={lang === 'ar' ? 'رمز التحقق بخطوتين (مثال: JBSWY3DPEHPK3PXP)' : '2FA Secret Key (e.g. JBSWY3DPEHPK3PXP)'}
                     className="w-full bg-[#090D14] border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 font-mono text-xs uppercase"
                   />
                 </div>

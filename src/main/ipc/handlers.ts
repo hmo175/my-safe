@@ -98,6 +98,16 @@ export function registerIpcHandlers(
     return true;
   });
 
+  // Add custom folder
+  ipcMain.handle('vault:addFolder', async (_, folderName: string) => {
+    return vaultManager.addFolder(folderName);
+  });
+
+  // Delete custom folder
+  ipcMain.handle('vault:deleteFolder', async (_, folderName: string) => {
+    return vaultManager.deleteFolder(folderName);
+  });
+
   // Save settings
   ipcMain.handle('vault:saveSettings', async (_, settings) => {
     const data = vaultManager.getData();
@@ -149,10 +159,14 @@ export function registerIpcHandlers(
 
   ipcMain.handle('biometrics:unlock', async () => {
     if (!winHello.isEnabled()) {
-      return { success: false, error: 'بصمة Windows Hello غير مفعلة بعد. يرجى تسجيل الدخول أولاً بكلمة المرور الرئيسية لتفعيلها.' };
+      return { success: false, error: 'بصمة الاصبع غير مفعلة بعد. يرجى تسجيل الدخول أولاً بكلمة المرور الرئيسية لتفعيلها.' };
     }
 
-    const { success, status } = await winHello.requestVerification('My Safe - تسجيل الدخول بالبصمة');
+    try {
+      mainWindow?.setAlwaysOnTop(false);
+    } catch {}
+
+    const { success, status } = await winHello.requestVerification('My Safe - تأكيد الهوية');
     if (!success) {
       if (status === 'Canceled') {
         return { success: false, error: 'تم إلغاء عملية المصادقة بالبصمة من قبل المستخدم.' };
@@ -207,11 +221,49 @@ export function registerIpcHandlers(
     return true;
   });
 
-  // Select and upload file to secure encrypted vault
-  ipcMain.handle('vault:selectAndUploadFile', async () => {
+  // Select and upload file(s) to secure encrypted vault
+  ipcMain.handle('vault:selectAndUploadFiles', async (_, folder: string = 'شخصي') => {
     const result = await dialog.showOpenDialog(mainWindow, {
-      title: 'اختر ملفاً لتشفيره وحفظه في الخزنة',
-      properties: ['openFile'],
+      title: 'اختر ملفاً أو عدة ملفات لتشفيرها وحفظها بأمان',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'جميع الملفات المدعومة', extensions: ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'txt', 'docx', 'zip'] },
+        { name: 'مستندات PDF', extensions: ['pdf'] },
+        { name: 'صور', extensions: ['png', 'jpg', 'jpeg', 'webp'] },
+        { name: 'جميع الملفات', extensions: ['*'] },
+      ],
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return [];
+    }
+
+    const savedItems = [];
+    for (const filePath of result.filePaths) {
+      const fileName = path.basename(filePath);
+      const fileBuffer = fs.readFileSync(filePath);
+
+      // Simple mime detector based on extension
+      const ext = path.extname(filePath).toLowerCase();
+      let mimeType = 'application/octet-stream';
+      if (ext === '.pdf') mimeType = 'application/pdf';
+      else if (['.jpg', '.jpeg'].includes(ext)) mimeType = 'image/jpeg';
+      else if (ext === '.png') mimeType = 'image/png';
+      else if (ext === '.webp') mimeType = 'image/webp';
+      else if (ext === '.txt') mimeType = 'text/plain';
+
+      const fileItem = vaultManager.saveEncryptedFile(fileBuffer, fileName, mimeType, folder);
+      savedItems.push(fileItem);
+    }
+
+    return savedItems;
+  });
+
+  // Backward compatible single file selector
+  ipcMain.handle('vault:selectAndUploadFile', async (_, folder: string = 'شخصي') => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'اختر ملفاً لتشفيره وحفظه بأمان',
+      properties: ['openFile', 'multiSelections'],
       filters: [
         { name: 'جميع الملفات المدعومة', extensions: ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'txt', 'docx', 'zip'] },
         { name: 'مستندات PDF', extensions: ['pdf'] },
@@ -228,7 +280,6 @@ export function registerIpcHandlers(
     const fileName = path.basename(filePath);
     const fileBuffer = fs.readFileSync(filePath);
 
-    // Simple mime detector based on extension
     const ext = path.extname(filePath).toLowerCase();
     let mimeType = 'application/octet-stream';
     if (ext === '.pdf') mimeType = 'application/pdf';
@@ -237,7 +288,7 @@ export function registerIpcHandlers(
     else if (ext === '.webp') mimeType = 'image/webp';
     else if (ext === '.txt') mimeType = 'text/plain';
 
-    return vaultManager.saveEncryptedFile(fileBuffer, fileName, mimeType);
+    return vaultManager.saveEncryptedFile(fileBuffer, fileName, mimeType, folder);
   });
 
   // Decrypt file into RAM and return as Base64 data URL for in-app secure preview

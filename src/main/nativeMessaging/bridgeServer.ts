@@ -1,5 +1,7 @@
 import http from 'http';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { dialog, BrowserWindow } from 'electron';
 import { VaultManager } from '../storage/vaultDb';
 
@@ -15,6 +17,34 @@ export class ExtensionBridgeServer {
     this.vaultManager = vaultManager;
     this.getMainWindow = getMainWindow;
     this.generateNewPairingCode();
+    this.loadStoredPairingToken();
+  }
+
+  private loadStoredPairingToken(): void {
+    try {
+      const configPath = path.join(this.vaultManager.getBaseDir(), 'bridge_pairing.json');
+      if (fs.existsSync(configPath)) {
+        const raw = fs.readFileSync(configPath, 'utf-8');
+        const data = JSON.parse(raw);
+        if (data && data.token) {
+          this.validPairingToken = data.token;
+          console.log('[Bridge] Loaded persistent pairing token successfully.');
+        }
+      }
+    } catch (err) {
+      console.warn('[Bridge] Failed to load stored pairing token:', err);
+    }
+  }
+
+  private savePairingToken(token: string): void {
+    try {
+      this.validPairingToken = token;
+      const configPath = path.join(this.vaultManager.getBaseDir(), 'bridge_pairing.json');
+      fs.writeFileSync(configPath, JSON.stringify({ token, createdAt: new Date().toISOString() }), 'utf-8');
+      console.log('[Bridge] Persistent pairing token saved successfully.');
+    } catch (err) {
+      console.warn('[Bridge] Failed to save pairing token:', err);
+    }
   }
 
   public generateNewPairingCode(): string {
@@ -69,7 +99,8 @@ export class ExtensionBridgeServer {
         // 2. Pairing Request
         if (req.url === '/api/pair') {
           if (payload.code && payload.code === this.currentPairingCode) {
-            this.validPairingToken = crypto.randomBytes(32).toString('hex');
+            const newToken = crypto.randomBytes(32).toString('hex');
+            this.savePairingToken(newToken);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ success: true, token: this.validPairingToken }));
           } else {

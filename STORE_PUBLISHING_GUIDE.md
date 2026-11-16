@@ -3,9 +3,9 @@
 **إعداد المطور:** hmo (`@hmo175`)  
 **الملفات الجاهزة للرفع في مجلد `release/`:**
 - **للمتصفحات المبنية على Chromium (Chrome, Edge, Brave, Opera, Vivaldi):**  
-  `release/MySafe-Extension-Chromium-v1.0.0.zip`
+  `release/MySafe-Extension-Chromium-v1.1.0.zip`
 - **لمتصفح Mozilla Firefox:**  
-  `release/MySafe-Extension-Firefox-v1.0.0.zip`
+  `release/MySafe-Extension-Firefox-v1.1.0.zip`
 
 ---
 
@@ -30,7 +30,7 @@
 ## 1️⃣ Google Chrome Web Store (ويستفيد منه Chrome + Brave + Vivaldi + Arc)
 1. توجه إلى لوحة مطوري كروم: https://chrome.google.com/webstore/devconsole
 2. سجّل حساب مطور (رسوم تسجيل لمرة واحدة في العمر بقيمة **$5** من جوجل).
-3. اضغط **New Item** ثم ارفع ملف: `release/MySafe-Extension-Chromium-v1.0.0.zip`.
+3. اضغط **New Item** ثم ارفع ملف: `release/MySafe-Extension-Chromium-v1.1.0.zip`.
 4. أضف أيقونة المتجر `extension/icons/icon128.png` ولقطة شاشة لإضافة المتصفح + التطبيق.
 5. في تبويب **Privacy practices** أجب بأن الإضافة لا تستخدم كوداً عن بُعد (No remote code) وضع رابط `PRIVACY_POLICY.md` وتبريرات الصلاحيات أعلاه.
 6. اضغط **Submit for review** (تستغرق المراجعة عادة 1–3 أيام).
@@ -40,7 +40,7 @@
 ## 2️⃣ Microsoft Edge Add-ons (مجاناً 100%)
 1. توجه إلى مركز شركاء مايكروسوفت: https://partner.microsoft.com/dashboard/microsoftedge
 2. سجّل حساب مطور Microsoft Edge (**مجاني تماماً**).
-3. اضغط **Create new extension** وارفع نفس الملف: `release/MySafe-Extension-Chromium-v1.0.0.zip`.
+3. اضغط **Create new extension** وارفع نفس الملف: `release/MySafe-Extension-Chromium-v1.1.0.zip`.
 4. املأ بيانات الخصوصية والوصف والأيقونة (`extension/icons/icon128.png`) واضغط **Publish**.
 
 ---
@@ -49,7 +49,7 @@
 1. توجه إلى بوابة مطوري موزيلا: https://addons.mozilla.org/developers/
 2. سجّل الدخول بحساب Mozilla (**مجاني تماماً**).
 3. اضغط **Submit a New Add-on** ← اختر **On this site**.
-4. ارفع الحزمة المخصصة لفايرفوكس: `release/MySafe-Extension-Firefox-v1.0.0.zip`.  
+4. ارفع الحزمة المخصصة لفايرفوكس: `release/MySafe-Extension-Firefox-v1.1.0.zip`.  
    *(هذه الحزمة مُعدّة مسبقاً بـ `background.scripts` و `browser_specific_settings.gecko.data_collection_permissions` المتوافقة مع معايير موزيلا 2025/2026)*.
 5. اجتز الفحص التلقائي واضغط **Submit**.
 
@@ -57,7 +57,7 @@
 
 ## 4️⃣ Opera Add-ons (مجاناً 100%)
 1. توجه إلى: https://addons.opera.com/developer/
-2. ارفع نفس حزمة Chromium: `release/MySafe-Extension-Chromium-v1.0.0.zip`.
+2. ارفع نفس حزمة Chromium: `release/MySafe-Extension-Chromium-v1.1.0.zip`.
 3. أضف الوصف والخصوصية وقدّم للمراجعة.
 
 ---

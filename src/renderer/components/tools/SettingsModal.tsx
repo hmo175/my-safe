@@ -263,9 +263,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <Fingerprint className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-white text-xs">Windows Hello (البصمة / الوجه)</h4>
+                <h4 className="font-bold text-white text-xs">
+                  {lang === 'ar' ? 'فك القفل ببصمة الإصبع أو الوجه' : 'Fingerprint & Face Unlock'}
+                </h4>
                 <p className="text-[11px] text-gray-400 mt-0.5">
-                  {helloAvailable ? 'متاح ومفعل لفك القفل السريع' : 'غير متوفر في هذا الجهاز'}
+                  {helloAvailable 
+                    ? (lang === 'ar' ? 'متاح ومفعل لفك القفل السريع' : 'Available and enabled for quick unlock')
+                    : (lang === 'ar' ? 'غير متوفر في هذا الجهاز' : 'Not available on this PC')}
                 </p>
               </div>
             </div>
@@ -502,7 +506,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className="w-full mt-1 py-2 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-md transition-all"
             >
               <FileSpreadsheet className="w-4 h-4" />
-              <span>استيراد جميع كلمات المرور الآن (CSV)</span>
+              <span>{lang === 'ar' ? 'استيراد كلمات المرور من المتصفح (CSV)' : 'Import Passwords from Browser (CSV)'}</span>
             </button>
 
             {importStatus && (
@@ -520,9 +524,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <Download className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-xs">تصدير نسخة احتياطية مشفرة (.mysafe)</h4>
+                  <h4 className="font-bold text-white text-xs">
+                    {lang === 'ar' ? 'حفظ نسخة احتياطية آمنة ومشفرة' : 'Export Secure Encrypted Backup'}
+                  </h4>
                   <p className="text-[11px] text-gray-400 mt-0.5">
-                    حفظ نسخة احتياطية آمنة على فلاشة خارجية USB
+                    {lang === 'ar' 
+                      ? 'حفظ نسخة كاملة من بياناتك في ملف مشفر لنقلها أو استعادتها' 
+                      : 'Save an encrypted backup file to safely restore or transfer your data'}
                   </p>
                 </div>
               </div>
@@ -586,7 +594,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </span>
                   </div>
                   <p className="text-[11px] text-gray-400 mt-0.5 font-mono">
-                    My Safe Digital Vault • v1.0.0
+                    My Safe Digital Vault • v1.1.0
                   </p>
                 </div>
               </div>

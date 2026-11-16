@@ -1,6 +1,6 @@
 {
   "name": "my-safe",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "My Safe - Professional Secure Desktop Password Manager & Vault",
   "type": "module",
   "main": "dist-electron/index.js",

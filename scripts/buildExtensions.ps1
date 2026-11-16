@@ -55,8 +55,8 @@ function New-PosixZip {
     }
 }
 
-$chromiumZip = Join-Path $releaseDir "MySafe-Extension-Chromium-v1.0.0.zip"
-$firefoxZip = Join-Path $releaseDir "MySafe-Extension-Firefox-v1.0.0.zip"
+$chromiumZip = Join-Path $releaseDir "MySafe-Extension-Chromium-v1.1.0.zip"
+$firefoxZip = Join-Path $releaseDir "MySafe-Extension-Firefox-v1.1.0.zip"
 
 New-PosixZip -SourceDir $chromiumDir -DestZip $chromiumZip
 New-PosixZip -SourceDir $firefoxDir -DestZip $firefoxZip

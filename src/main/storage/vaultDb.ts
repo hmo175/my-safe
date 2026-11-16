@@ -199,7 +199,7 @@ export class VaultManager {
     // 5. Initialize empty vault data
     const initialData: VaultData = {
       items: [],
-      folders: ['Personal', 'Work', 'Finance'],
+      folders: ['شخصي', 'العمل', 'مالي'],
       settings: {
         autoLockMinutes: 5,
         clipboardClearSeconds: 30,
@@ -380,7 +380,7 @@ export class VaultManager {
   /**
    * Encrypts and saves a binary file into the secure files vault
    */
-  public saveEncryptedFile(fileBuffer: Buffer, fileName: string, mimeType: string): FileItem {
+  public saveEncryptedFile(fileBuffer: Buffer, fileName: string, mimeType: string, folder: string = 'شخصي'): FileItem {
     if (!this.isUnlocked() || !this.masterKey || !this.cachedData) {
       throw new Error('Vault is locked.');
     }
@@ -401,7 +401,7 @@ export class VaultManager {
       fileSize: fileBuffer.length,
       mimeType,
       storedFileName,
-      folder: 'Personal',
+      folder: folder || 'شخصي',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       favorite: false,
@@ -411,6 +411,32 @@ export class VaultManager {
     this.saveVaultData();
 
     return fileItem;
+  }
+
+  public addFolder(folderName: string): boolean {
+    if (!this.isUnlocked() || !this.cachedData) throw new Error('Vault is locked.');
+    const trimmed = folderName.trim();
+    if (!trimmed) return false;
+    if (!this.cachedData.folders) this.cachedData.folders = [];
+    if (!this.cachedData.folders.includes(trimmed)) {
+      this.cachedData.folders.push(trimmed);
+      this.saveVaultData();
+      return true;
+    }
+    return false;
+  }
+
+  public deleteFolder(folderName: string): boolean {
+    if (!this.isUnlocked() || !this.cachedData) throw new Error('Vault is locked.');
+    if (!this.cachedData.folders) return false;
+    this.cachedData.folders = this.cachedData.folders.filter(f => f !== folderName);
+    this.cachedData.items.forEach(it => {
+      if (it.folder === folderName) {
+        it.folder = 'شخصي';
+      }
+    });
+    this.saveVaultData();
+    return true;
   }
 
   /**

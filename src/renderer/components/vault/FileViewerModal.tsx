@@ -85,7 +85,7 @@ export const FileViewerModal: React.FC<FileViewerModalProps> = ({
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
                   <ShieldCheck className="w-3 h-3" />
-                  معاينة آمنة في الذاكرة المؤقتة (RAM)
+                  معاينة فورية وآمنة للمستند
                 </span>
                 <span className="text-[10px] text-gray-500 font-mono">
                   {(fileItem.fileSize / 1024).toFixed(1)} KB

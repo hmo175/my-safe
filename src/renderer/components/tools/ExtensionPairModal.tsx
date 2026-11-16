@@ -212,7 +212,7 @@ export const ExtensionPairModal: React.FC<ExtensionPairModalProps> = ({
         {/* Security Notice */}
         <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/20 flex items-center gap-2.5 text-[11px] text-emerald-300">
           <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-          <span>الربط مشفر ومحمي برمز لمرة واحدة ويعمل محلياً عبر منفذ آمن دون خروج أي بيانات للإنترنت.</span>
+          <span>اتصال آمن ومباشر داخل جهازك دون خروج أي بيانات للإنترنت.</span>
         </div>
 
         {/* Footer */}

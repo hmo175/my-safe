@@ -2,7 +2,7 @@
     "manifest_version":  3,
     "name":  "My Safe - Digital Password Vault",
     "short_name":  "My Safe",
-    "version":  "1.0.0",
+    "version":  "1.1.0",
     "description":  "Zero-knowledge autofill companion for My Safe Desktop Vault. Securely fill and save passwords locally via encrypted loopback bridge.",
     "author":  "hmo (@hmo175)",
     "homepage_url":  "https://github.com/hmo175/my-safe",

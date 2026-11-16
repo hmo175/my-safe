@@ -60,6 +60,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    if (res.unlocked === false) {
+      statusDot.className = 'status-dot locked';
+      pairSection.style.display = 'none';
+      connectedSection.style.display = 'block';
+      renderMessage(
+        accountsListEl,
+        '🔒 الخزنة مقفلة حالياً.\nيرجى فتح تطبيق My Safe وفك القفل بالبصمة أو كلمة المرور لإتاحة الحسابات هنا.',
+        '#F59E0B'
+      );
+      return;
+    }
+
     statusDot.className = 'status-dot';
     pairSection.style.display = 'none';
     connectedSection.style.display = 'block';
